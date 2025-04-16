@@ -18,7 +18,10 @@ MoviePilot插件集合，包含以下插件：
 
 ### 安装方法
 
-将插件添加到MoviePilot的插件目录，然后在MoviePilot管理界面启用插件。
+在MoviePilot的插件管理页面，添加此仓库地址：
+```
+https://github.com/heweile/MoviePilot-Plugins
+```
 
 ### 配置选项
 

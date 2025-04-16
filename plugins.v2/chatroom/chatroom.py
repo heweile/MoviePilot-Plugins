@@ -5,19 +5,11 @@ import re
 from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime, timedelta
 
-# 修改导入路径以适配V2版本
-try:
-    # V2版本导入
-    from app.plugins.plugin_base import _PluginBase
-    from app.core.config import settings
-    from app.log import logger
-    from app.schemas.types import MediaType, NotificationType
-except ImportError:
-    # 兼容V1版本导入
-    from app.plugins import _PluginBase
-    from app.core.config import settings
-    from app.log import logger
-    from app.schemas.types import MediaType, NotificationType
+# V2版本导入
+from app.plugins.plugin_base import _PluginBase
+from app.core.config import settings
+from app.log import logger
+from app.schemas.types import MediaType, NotificationType
 
 
 class Chatroom(_PluginBase):
@@ -52,7 +44,7 @@ class Chatroom(_PluginBase):
         插件初始化
         """
         # 设置聊天数据保存路径
-        self._chat_data_path = os.path.join(settings.TEMP_PATH, 'chatroom_data.json')
+        self._chat_data_path = os.path.join(settings.CONFIG_PATH, 'chatroom_data.json')
         
         # 确保目录存在
         os.makedirs(os.path.dirname(self._chat_data_path), exist_ok=True)
@@ -80,35 +72,35 @@ class Chatroom(_PluginBase):
         """
         return [
             {
-                "path": "/plugins/chatroom/chat/messages",
+                "path": "/chat/messages",
                 "endpoint": self.get_messages,
                 "methods": ["GET"],
                 "summary": "获取聊天消息",
                 "description": "获取最近的聊天消息记录"
             },
             {
-                "path": "/plugins/chatroom/chat/send",
+                "path": "/chat/send",
                 "endpoint": self.send_message,
                 "methods": ["POST"],
                 "summary": "发送聊天消息",
                 "description": "发送一条聊天消息"
             },
             {
-                "path": "/plugins/chatroom/chat/online",
+                "path": "/chat/online",
                 "endpoint": self.get_online_users,
                 "methods": ["GET"],
                 "summary": "获取在线用户",
                 "description": "获取当前在线的用户列表"
             },
             {
-                "path": "/plugins/chatroom/chat/heartbeat",
+                "path": "/chat/heartbeat",
                 "endpoint": self.user_heartbeat,
                 "methods": ["POST"],
                 "summary": "用户心跳",
                 "description": "更新用户在线状态"
             },
             {
-                "path": "/plugins/chatroom/chat/clear",
+                "path": "/chat/clear",
                 "endpoint": self.clear_messages,
                 "methods": ["POST"],
                 "summary": "清空聊天记录",
@@ -329,11 +321,11 @@ class Chatroom(_PluginBase):
                     {
                         "component": "ChatRoom",
                         "props": {
-                            "apiMessages": "/api/plugins/chatroom/chat/messages",
-                            "apiSend": "/api/plugins/chatroom/chat/send",
-                            "apiOnline": "/api/plugins/chatroom/chat/online",
-                            "apiHeartbeat": "/api/plugins/chatroom/chat/heartbeat",
-                            "apiClear": "/api/plugins/chatroom/chat/clear"
+                            "apiMessages": "/api/plugin/chatroom/chat/messages",
+                            "apiSend": "/api/plugin/chatroom/chat/send",
+                            "apiOnline": "/api/plugin/chatroom/chat/online",
+                            "apiHeartbeat": "/api/plugin/chatroom/chat/heartbeat",
+                            "apiClear": "/api/plugin/chatroom/chat/clear"
                         }
                     }
                 ]

@@ -1,23 +1,14 @@
 ﻿{
-  "packages": [
-    {
-      "name": "聊天室",
-      "id": "chatroom",
-      "version": "v1.0",
-      "author": "heweile",
-      "description": "MoviePilot在线聊天室，支持实时聊天、表情和在线状态显示",
-      "icon": "chat_bubble",
-      "main": "plugins/chatroom",
-      "repository": "heweile/MoviePilot-Plugins",
-      "tags": ["聊天", "工具"],
-      "level": 1,
-      "installed": false
-    }
-  ],
-  "repository": {
-    "name": "heweile插件仓库",
-    "description": "包含聊天室等实用插件的合集",
+  "chatroom": {
+    "name": "聊天室",
+    "description": "MoviePilot在线聊天室，支持实时聊天、表情和在线状态显示",
+    "version": "v1.0",
+    "labels": "工具,聊天",
+    "icon": "chat_bubble",
     "author": "heweile",
-    "url": "https://github.com/heweile/MoviePilot-Plugins"
+    "level": 1,
+    "history": {
+      "v1.0": "首次发布，支持实时聊天功能，表情符号，在线状态和链接自动识别"
+    }
   }
 }

@@ -5,10 +5,19 @@ import re
 from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime, timedelta
 
-from app.core.config import settings
-from app.plugins import _PluginBase
-from app.log import logger
-from app.schemas.types import MediaType, NotificationType
+# 修改导入路径以适配V2版本
+try:
+    # V2版本导入
+    from app.plugins.plugin_base import _PluginBase
+    from app.core.config import settings
+    from app.log import logger
+    from app.schemas.types import MediaType, NotificationType
+except ImportError:
+    # 兼容V1版本导入
+    from app.plugins import _PluginBase
+    from app.core.config import settings
+    from app.log import logger
+    from app.schemas.types import MediaType, NotificationType
 
 
 class Chatroom(_PluginBase):

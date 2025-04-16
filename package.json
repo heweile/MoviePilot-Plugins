@@ -1,7 +1,7 @@
 {
   "name": "聊天室",
   "id": "chatroom",
-  "author": "yourusername",
+  "author": "heweile",
   "version": "1.0",
   "level": 1,
   "description": "MoviePilot在线聊天室，支持实时聊天、表情和在线状态显示",

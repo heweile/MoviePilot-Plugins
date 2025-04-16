@@ -1,8 +1,11 @@
 ﻿{
-  "chatroom": {
-    "name": "聊天室",
-    "version": "1.0",
-    "author": "heweile",
-    "level": 1
-  }
+  "name": "聊天室",
+  "id": "chatroom",
+  "version": "v1.0",
+  "author": "heweile",
+  "description": "MoviePilot在线聊天室，支持实时聊天、表情和在线状态显示",
+  "icon": "chat_bubble",
+  "main": "chatroom",
+  "level": 1,
+  "installed": false
 }

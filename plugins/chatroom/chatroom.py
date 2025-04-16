@@ -21,9 +21,9 @@ class Chatroom(_PluginBase):
     # 插件版本
     plugin_version = "1.0"
     # 插件作者
-    plugin_author = "yourusername"
+    plugin_author = "heweile"
     # 作者主页
-    author_url = "https://github.com/yourusername"
+    author_url = "https://github.com/heweile"
     # 插件配置项ID前缀
     plugin_config_prefix = "chatroom_"
     # 加载顺序
@@ -44,6 +44,10 @@ class Chatroom(_PluginBase):
         """
         # 设置聊天数据保存路径
         self._chat_data_path = os.path.join(settings.TEMP_PATH, 'chatroom_data.json')
+        
+        # 确保目录存在
+        os.makedirs(os.path.dirname(self._chat_data_path), exist_ok=True)
+        
         # 加载配置
         if config:
             if config.get('max_messages'):
@@ -67,35 +71,35 @@ class Chatroom(_PluginBase):
         """
         return [
             {
-                "path": "/chat/messages",
+                "path": "/plugins/chatroom/chat/messages",
                 "endpoint": self.get_messages,
                 "methods": ["GET"],
                 "summary": "获取聊天消息",
                 "description": "获取最近的聊天消息记录"
             },
             {
-                "path": "/chat/send",
+                "path": "/plugins/chatroom/chat/send",
                 "endpoint": self.send_message,
                 "methods": ["POST"],
                 "summary": "发送聊天消息",
                 "description": "发送一条聊天消息"
             },
             {
-                "path": "/chat/online",
+                "path": "/plugins/chatroom/chat/online",
                 "endpoint": self.get_online_users,
                 "methods": ["GET"],
                 "summary": "获取在线用户",
                 "description": "获取当前在线的用户列表"
             },
             {
-                "path": "/chat/heartbeat",
+                "path": "/plugins/chatroom/chat/heartbeat",
                 "endpoint": self.user_heartbeat,
                 "methods": ["POST"],
                 "summary": "用户心跳",
                 "description": "更新用户在线状态"
             },
             {
-                "path": "/chat/clear",
+                "path": "/plugins/chatroom/chat/clear",
                 "endpoint": self.clear_messages,
                 "methods": ["POST"],
                 "summary": "清空聊天记录",
@@ -231,7 +235,8 @@ class Chatroom(_PluginBase):
                 "path": "/chatroom",
                 "component": "View",
                 "icon": self.plugin_icon,
-                "children": []
+                "show": True,
+                "childs": []
             }
         ]
 

@@ -1,3 +1,3 @@
 from .chatroom import Chatroom
 
-__version__ = '1.0' 
+plugin_version = '1.0' 

@@ -2,15 +2,24 @@
 import time
 import json
 import re
+import traceback
+import sys
 from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime, timedelta
 
 # V2版本导入
-from app.plugins.plugin_base import _PluginBase
-from app.core.config import settings
-from app.log import logger
-from app.schemas.types import MediaType, NotificationType
+try:
+    from app.plugins.plugin_base import _PluginBase
+    from app.core.config import settings
+    from app.log import logger
+    from app.schemas.types import MediaType, NotificationType
+    logger.info("ChatroomEnhanced 插件导入依赖成功")
+except Exception as e:
+    logger.error(f"ChatroomEnhanced 插件导入依赖失败: {str(e)}")
+    logger.error(traceback.format_exc())
 
+# 添加插件启动日志
+logger.info("============== ChatroomEnhanced 插件开始加载 ==============")
 
 class ChatroomEnhanced(_PluginBase):
     # 插件名称
@@ -39,37 +48,52 @@ class ChatroomEnhanced(_PluginBase):
     _max_messages = 100
     _online_timeout = 300  # 用户在线超时时间，单位秒
 
+    def __init__(self):
+        super().__init__()
+        logger.info(f"ChatroomEnhanced 插件类 __init__ 方法被调用")
+        
     def init_plugin(self, config: dict = None):
         """
         插件初始化
         """
-        # 设置聊天数据保存路径
-        self._chat_data_path = os.path.join(settings.CONFIG_PATH, 'chatroom_enhanced_data.json')
-        
-        # 确保目录存在
-        os.makedirs(os.path.dirname(self._chat_data_path), exist_ok=True)
-        
-        # 加载配置
-        if config:
-            if config.get('max_messages'):
-                try:
-                    self._max_messages = int(config.get('max_messages'))
-                except Exception as e:
-                    logger.error(f"加载配置失败: {str(e)}")
-            if config.get('online_timeout'):
-                try:
-                    self._online_timeout = int(config.get('online_timeout'))
-                except Exception as e:
-                    logger.error(f"加载配置失败: {str(e)}")
+        try:
+            logger.info(f"ChatroomEnhanced 插件开始初始化，配置: {config}")
+            
+            # 设置聊天数据保存路径
+            self._chat_data_path = os.path.join(settings.CONFIG_PATH, 'chatroom_enhanced_data.json')
+            logger.info(f"ChatroomEnhanced 数据路径: {self._chat_data_path}")
+            
+            # 确保目录存在
+            os.makedirs(os.path.dirname(self._chat_data_path), exist_ok=True)
+            
+            # 加载配置
+            if config:
+                logger.info(f"ChatroomEnhanced 配置项: {config}")
+                if config.get('max_messages'):
+                    try:
+                        self._max_messages = int(config.get('max_messages'))
+                        logger.info(f"ChatroomEnhanced 最大消息数量设置为: {self._max_messages}")
+                    except Exception as e:
+                        logger.error(f"ChatroomEnhanced 加载max_messages配置失败: {str(e)}")
+                if config.get('online_timeout'):
+                    try:
+                        self._online_timeout = int(config.get('online_timeout'))
+                        logger.info(f"ChatroomEnhanced 在线超时时间设置为: {self._online_timeout}")
+                    except Exception as e:
+                        logger.error(f"ChatroomEnhanced 加载online_timeout配置失败: {str(e)}")
 
-        # 加载聊天记录
-        self._load_messages()
-        logger.info(f"聊天中心增强版插件初始化完成")
+            # 加载聊天记录
+            self._load_messages()
+            logger.info(f"ChatroomEnhanced 插件初始化完成，已加载 {len(self._messages)} 条消息")
+        except Exception as e:
+            logger.error(f"ChatroomEnhanced 插件初始化失败: {str(e)}")
+            logger.error(traceback.format_exc())
 
     def get_api(self) -> List[dict]:
         """
         注册插件API
         """
+        logger.info(f"ChatroomEnhanced 注册API")
         return [
             {
                 "path": "/messages",
@@ -230,6 +254,7 @@ class ChatroomEnhanced(_PluginBase):
         """
         注册插件页面
         """
+        logger.info(f"ChatroomEnhanced 注册页面")
         return [
             {
                 "name": "聊天中心",
@@ -245,18 +270,21 @@ class ChatroomEnhanced(_PluginBase):
         """
         获取插件状态
         """
+        logger.info(f"ChatroomEnhanced 获取状态: True")
         return True
 
     def get_service(self) -> Optional[Dict[str, Any]]:
         """
         获取插件服务接口
         """
-        pass
+        logger.info(f"ChatroomEnhanced 获取服务接口")
+        return None
 
     def get_form(self) -> Tuple[List[dict], Dict[str, Any]]:
         """
         获取插件配置表单
         """
+        logger.info(f"ChatroomEnhanced 获取配置表单")
         return [
             {
                 'component': 'VForm',
@@ -311,6 +339,7 @@ class ChatroomEnhanced(_PluginBase):
         """
         返回页面配置
         """
+        logger.info(f"ChatroomEnhanced 获取页面配置")
         return [
             {
                 "component": "div",
@@ -336,6 +365,7 @@ class ChatroomEnhanced(_PluginBase):
         """
         返回页面组件
         """
+        logger.info(f"ChatroomEnhanced 获取页面组件")
         return [
             {
                 "id": "ChatRoom",
@@ -651,14 +681,22 @@ class ChatroomEnhanced(_PluginBase):
         """
         加载聊天消息
         """
-        if os.path.exists(self._chat_data_path):
-            try:
-                with open(self._chat_data_path, 'r', encoding='utf-8') as f:
-                    self._messages = json.load(f)
-            except Exception as e:
-                logger.error(f"加载聊天记录失败: {str(e)}")
+        try:
+            if os.path.exists(self._chat_data_path):
+                try:
+                    with open(self._chat_data_path, 'r', encoding='utf-8') as f:
+                        self._messages = json.load(f)
+                        logger.info(f"ChatroomEnhanced 成功加载聊天记录，共 {len(self._messages)} 条消息")
+                except Exception as e:
+                    logger.error(f"ChatroomEnhanced 加载聊天记录失败: {str(e)}")
+                    logger.error(traceback.format_exc())
+                    self._messages = []
+            else:
+                logger.info(f"ChatroomEnhanced 聊天记录文件不存在，初始化空列表")
                 self._messages = []
-        else:
+        except Exception as e:
+            logger.error(f"ChatroomEnhanced _load_messages 出现异常: {str(e)}")
+            logger.error(traceback.format_exc())
             self._messages = []
 
     def _save_messages(self):
@@ -668,5 +706,19 @@ class ChatroomEnhanced(_PluginBase):
         try:
             with open(self._chat_data_path, 'w', encoding='utf-8') as f:
                 json.dump(self._messages, f, ensure_ascii=False, indent=2)
+                logger.info(f"ChatroomEnhanced 保存聊天记录成功，共 {len(self._messages)} 条消息")
         except Exception as e:
-            logger.error(f"保存聊天记录失败: {str(e)}")
+            logger.error(f"ChatroomEnhanced 保存聊天记录失败: {str(e)}")
+            logger.error(traceback.format_exc())
+
+# 添加插件结束日志
+logger.info("============== ChatroomEnhanced 插件加载完成 ==============")
+
+# 输出插件环境信息
+try:
+    logger.info(f"Python 版本: {sys.version}")
+    logger.info(f"操作系统: {sys.platform}")
+    logger.info(f"插件路径: {os.path.dirname(os.path.abspath(__file__))}")
+except Exception as e:
+    logger.error(f"输出环境信息失败: {str(e)}")
+    logger.error(traceback.format_exc())

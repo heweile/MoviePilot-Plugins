@@ -4,22 +4,100 @@ import json
 import re
 import traceback
 import sys
+import importlib.util
 from typing import List, Dict, Any, Tuple, Optional
 from datetime import datetime, timedelta
 
+# 打印当前运行路径
+print(f"当前工作目录: {os.getcwd()}")
+
+# 尝试不同的导入路径
+plugin_base_paths = [
+    # 标准路径
+    'app.plugins.plugin_base',
+    # MoviePilot V2 路径
+    'app.plugins.plugin_base',
+    # 直接使用绝对路径
+    'app.app.plugins.plugin_base',
+    # 开发环境路径
+    'plugins.plugin_base'
+]
+
+_PluginBase = None
+
+# 尝试不同的路径导入
+for path in plugin_base_paths:
+    try:
+        module = importlib.import_module(path)
+        _PluginBase = getattr(module, '_PluginBase')
+        print(f"成功从 {path} 导入 _PluginBase")
+        break
+    except (ImportError, AttributeError) as e:
+        print(f"从 {path} 导入失败: {str(e)}")
+
+if _PluginBase is None:
+    print("无法导入 _PluginBase，插件无法正常工作")
+    
+    # 最后尝试直接添加路径
+    possible_paths = ['/app', '/app/app', os.path.abspath(os.path.join(os.getcwd(), '..'))]
+    for path in possible_paths:
+        if path not in sys.path:
+            sys.path.append(path)
+            print(f"添加路径: {path}")
+    
+    # 再次尝试导入
+    try:
+        from app.plugins.plugin_base import _PluginBase
+        print("添加路径后成功导入 _PluginBase")
+    except ImportError as e:
+        print(f"最终导入尝试失败: {str(e)}")
+        # 使用占位类，避免运行时错误
+        class _PluginBase:
+            def __init__(self):
+                pass
+        print("使用占位基类")
+
+# 添加详细的路径日志，帮助调试
+try:
+    # 输出插件路径信息
+    plugin_dir = os.path.dirname(os.path.abspath(__file__))
+    print(f"插件文件路径: {plugin_dir}")
+    sys.path.insert(0, os.path.dirname(os.path.dirname(plugin_dir)))
+    print(f"系统路径: {sys.path}")
+except Exception as e:
+    print(f"路径检查出错: {str(e)}")
+
 # V2版本导入
 try:
-    from app.plugins.plugin_base import _PluginBase
     from app.core.config import settings
     from app.log import logger
     from app.schemas.types import MediaType, NotificationType
-    logger.info("ChatroomEnhanced 插件导入依赖成功")
+    print("ChatroomEnhanced 插件导入依赖成功 - 标准路径")
 except Exception as e:
-    logger.error(f"ChatroomEnhanced 插件导入依赖失败: {str(e)}")
-    logger.error(traceback.format_exc())
+    try:
+        # 尝试替代导入路径 - 适用于 /app/app/plugins/ 目录
+        import sys
+        sys.path.append('/app')
+        from app.core.config import settings
+        from app.log import logger
+        from app.schemas.types import MediaType, NotificationType
+        print("ChatroomEnhanced 通过替代路径导入依赖成功 - /app")
+    except Exception as e2:
+        print(f"无法导入依赖1: {str(e)} | 替代导入失败2: {str(e2)}")
+        try:
+            # 第三种导入尝试 - 直接使用相对路径
+            import sys
+            sys.path.append('/app/app')
+            from plugins.plugin_base import _PluginBase
+            from core.config import settings
+            from log import logger
+            from schemas.types import MediaType, NotificationType
+            print("ChatroomEnhanced 通过第三种路径导入依赖成功 - /app/app")
+        except Exception as e3:
+            print(f"所有导入尝试均失败: {str(e3)}")
 
 # 添加插件启动日志
-logger.info("============== ChatroomEnhanced 插件开始加载 ==============")
+print("============== ChatroomEnhanced 插件开始加载 ==============")
 
 class ChatroomEnhanced(_PluginBase):
     # 插件名称
@@ -29,7 +107,7 @@ class ChatroomEnhanced(_PluginBase):
     # 插件图标
     plugin_icon = "chat"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "heweile"
     # 作者主页
@@ -712,7 +790,7 @@ class ChatroomEnhanced(_PluginBase):
             logger.error(traceback.format_exc())
 
 # 添加插件结束日志
-logger.info("============== ChatroomEnhanced 插件加载完成 ==============")
+print("============== ChatroomEnhanced 插件加载完成 ==============")
 
 # 输出插件环境信息
 try:
@@ -722,3 +800,9 @@ try:
 except Exception as e:
     logger.error(f"输出环境信息失败: {str(e)}")
     logger.error(traceback.format_exc())
+
+# 从当前文件导入实际插件类
+from .chatroom import ChatroomEnhanced
+
+# 只暴露插件类
+__all__ = ['ChatroomEnhanced']

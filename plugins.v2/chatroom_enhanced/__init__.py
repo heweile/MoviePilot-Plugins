@@ -27,7 +27,7 @@ class ChatroomEnhanced(_PluginBase):
     # 插件描述
     plugin_desc = "多功能聊天室，支持实时交流、表情和在线状态显示"
     # 插件图标
-    plugin_icon = "chatroom.svg"
+    plugin_icon = "chat"
     # 插件版本
     plugin_version = "1.2"
     # 插件作者
